@@ -4,7 +4,11 @@ import json
 import os
 from pymongo import MongoClient
 
-CONNECTION_STRING = "mongodb+srv://albion:tJAmID8vqeM8YzrZ@pugs.0ra0ugs.mongodb.net/?retryWrites=true&w=majority"
+# Connection string
+with open('KEYS.json', 'r') as f:
+    data = json.load(f)
+
+CONNECTION_STRING = data['DB_CONN_STRING']
 # Create an instance of the mongo client
 client = MongoClient(CONNECTION_STRING)
 # Get the database
@@ -13,10 +17,10 @@ db = client.get_database("pugs")
 players_collection = db["players"]
 
 #Bot Login
-with open('BOT_KEYS.json', 'r') as f:
+with open('KEYS.json', 'r') as f:
     discordToken = json.load(f)
 
-token = discordToken['TOKEN']
+token = discordToken['BOT_TOKEN']
 intents = discord.Intents.default()
 client = commands.Bot(command_prefix="!", intents=intents)
 
