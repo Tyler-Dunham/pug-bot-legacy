@@ -7,10 +7,12 @@ import os
 with open('BOT_KEYS.json', 'r') as f:
     discordToken = json.load(f)
 
-# TODO: get bot client secret and add to BOT_KEYS.json with key 'token'
 token = discordToken['TOKEN']
-client = commands.Bot(command_prefix = "!")
-"""@client.command()
+intents = discord.Intents.default()
+client = commands.Bot(command_prefix="!", intents=intents)
+
+"""
+@client.command()
 async def load(ctx, extension):
 	client.load_extension(f'cogs.{extension}')
 
