@@ -2,6 +2,15 @@ import discord
 from discord.ext import commands
 import json
 import os
+from pymongo import MongoClient
+
+CONNECTION_STRING = "mongodb+srv://albion:tJAmID8vqeM8YzrZ@pugs.0ra0ugs.mongodb.net/?retryWrites=true&w=majority"
+# Create an instance of the mongo client
+client = MongoClient(CONNECTION_STRING)
+# Get the database
+db = client.get_database("pugs")
+# Get players collection
+players_collection = db["players"]
 
 #Bot Login
 with open('BOT_KEYS.json', 'r') as f:
