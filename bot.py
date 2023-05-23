@@ -9,7 +9,10 @@ with open('KEYS.json', 'r') as f:
     data = json.load(f)
     
 # Connect to db (db.py)
-connect_db(data)
+db = connect_db(data)
+
+# Get players collection
+players_collection = db["players"]
 
 # Bot Login Reqs
 token = data['BOT_TOKEN']
