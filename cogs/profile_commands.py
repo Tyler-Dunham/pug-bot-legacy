@@ -85,7 +85,7 @@ class ProfileCommands(commands.Cog):
             return
         
         elos = [elo] #check_valid_elo takes in a list
-        if self.check_valid_elo(elos)is None: # A length of 0 means an empty list was returned, meaning there was an invalid elo entered
+        if self.check_valid_elo(elos) is None: # A length of 0 means an empty list was returned, meaning there was an invalid elo entered
             await ctx.send("Invalid elo entered. Command suspended.")
             return
         else:
