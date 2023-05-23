@@ -20,7 +20,7 @@ class ProfileCommands(commands.Cog):
         # Check if elo is in range
         for elo in elos:
             if (elo) not in range(0, 5001):          
-                return new_elos
+                return None
             # Finalize elos in new_elos (Default elos if 0)
             elo = elo if elo != 0 else 2500
             new_elos.append(elo)
@@ -45,7 +45,7 @@ class ProfileCommands(commands.Cog):
 
         # Check if elos are valid
         elos = [tank_elo, dps_elo, support_elo] # List because check_valid_elo takes a list
-        if len(self.check_valid_elo(elos)) == 0: # A length of 0 means an empty list was returned, meaning there was an invalid elo entered
+        if self.check_valid_elo(elos) is None: # A length of 0 means an empty list was returned, meaning there was an invalid elo entered
             await ctx.send("Invalid elo entered. Command suspended.")
             return
         else:
@@ -85,7 +85,7 @@ class ProfileCommands(commands.Cog):
             return
         
         elos = [elo] #check_valid_elo takes in a list
-        if len(self.check_valid_elo(elos)) == 0: # A length of 0 means an empty list was returned, meaning there was an invalid elo entered
+        if self.check_valid_elo(elos)is None: # A length of 0 means an empty list was returned, meaning there was an invalid elo entered
             await ctx.send("Invalid elo entered. Command suspended.")
             return
         else:
