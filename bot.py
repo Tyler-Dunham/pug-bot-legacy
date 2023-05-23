@@ -19,6 +19,7 @@ client = commands.Bot(command_prefix = "!", intents=intents)
 # Load cogs on_ready
 @client.event
 async def on_ready():
+	print("!!!!!!!!!!! BOT IS ONLINE !!!!!!!!!!!")
 	for filename in os.listdir('./cogs'):
 		if filename.endswith('.py'):
 			await client.load_extension(f'cogs.{filename[:-3]}')
