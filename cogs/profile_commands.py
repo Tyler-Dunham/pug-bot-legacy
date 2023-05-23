@@ -17,8 +17,10 @@ class ProfileCommands(commands.Cog):
 
 
     # Command for users to create accounts on our database
-    @commands.command()
-    async def create(self, ctx, tank_elo: int, dps_elo: int, support_elo: int):
+    @commands.command(brief=": Create your profile", description="Create your profile with !create <tank_elo> <dps_elo> <support_elo>")
+    async def create(self, ctx, tank_elo: int = commands.parameter(description=": Your tank elo"), 
+                     dps_elo: int = commands.parameter(description=": Your dps elo"), 
+                     support_elo: int= commands.parameter(description=": Your support elo")):
         author = str(ctx.author)
         author_id = ctx.author.id
 
@@ -49,8 +51,9 @@ class ProfileCommands(commands.Cog):
 
 
     # Command for users to update accounts on our database
-    @commands.command()
-    async def update(self, ctx, role: str, elo: int):
+    @commands.command(brief=": Update your profile", description="Update a specific role with !update <role> <role_elo>")
+    async def update(self, ctx, role: str = commands.parameter(description=": Desired role to update"), 
+                     elo: int= commands.parameter(description=": New elo of desired role")):
         author_id = ctx.author.id # For database search purposes, ctx.author works as well but id is unique
 
         # check that a valid role was given
@@ -73,8 +76,8 @@ class ProfileCommands(commands.Cog):
 
 
     # Command for users to view accounts on our database
-    @commands.command()
-    async def view(self, ctx, user: str=None):
+    @commands.command(brief=": View a profile", description="View any profile on our database with !view <discord_tag>. Just !view will view your own account.")
+    async def view(self, ctx, user: str= commands.parameter(default=None, description=": Discord tag to search")):
         # Handles no parameters auto searching for ctx.author
         if user is None:
             user_to_find = str(ctx.author)
