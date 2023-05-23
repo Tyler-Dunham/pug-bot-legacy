@@ -2,22 +2,14 @@ import discord
 from discord.ext import commands
 import json
 import os
-from pymongo import MongoClient
-import asyncio
+from db import connect_db
 
-# Keys
+# Open keys
 with open('KEYS.json', 'r') as f:
     data = json.load(f)
     
-
-CONNECTION_STRING = data['DB_CONN_STRING']
-# Create an instance of the mongo client
-client = MongoClient(CONNECTION_STRING)
-# Get the database
-db = client.get_database("pugs")
-# Get players collection
-players_collection = db["players"]
-
+# Connect to db (db.py)
+connect_db(data)
 
 # Bot Login Reqs
 token = data['BOT_TOKEN']
