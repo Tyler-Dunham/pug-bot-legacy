@@ -8,7 +8,7 @@ class GameCommands(commands.Cog):
     with open('KEYS.json', 'r') as f:
         data = json.load(f)
 
-    # Initialize ProfileCommands
+    # Initialize GameCommands
     def __init__(self, client):
         self.client = client
         self.db = connect_db(self.data)
@@ -107,6 +107,6 @@ class GameCommands(commands.Cog):
         await ctx.send("Your winrate is " + rate + ".")
     
 
-# Connect ProfileCommands to the bot (client)
+# Connect GameCommands to the bot (client)
 async def setup(client):
     await client.add_cog(GameCommands(client))

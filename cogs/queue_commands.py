@@ -8,7 +8,7 @@ class QueueCommands(commands.Cog):
     with open('KEYS.json', 'r') as f:
         data = json.load(f)
 
-    # Initialize ProfileCommands
+    # Initialize QueueCommands
     def __init__(self, client):
         self.client = client
         self.db = connect_db(self.data)
@@ -133,6 +133,6 @@ class QueueCommands(commands.Cog):
         await ctx.send(f"{mention}\nTank Queue: {len(self.tank_queue)}/2\nDPS Queue: {len(self.dps_queue)}/4\nSupport Queue: {len(self.support_queue)}/4")
     
 
-# Connect ProfileCommands to the bot (client)
+# Connect QueueCommands to the bot (client)
 async def setup(client):
     await client.add_cog(QueueCommands(client))
