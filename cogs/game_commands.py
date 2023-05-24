@@ -20,6 +20,10 @@ class GameCommands(commands.Cog):
         decide = random.randint(0,len(maps)-1)
         await ctx.send("You will be playing on: " + maps[decide])
 
+    @commands.command()
+    async def bruh(self, ctx):
+        await ctx.send("bruh")
+
     
 
 
