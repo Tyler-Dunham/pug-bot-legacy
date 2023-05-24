@@ -27,7 +27,84 @@ class GameCommands(commands.Cog):
     @commands.command()
     async def moogagod(self, ctx):
         await ctx.send("Leo is a corrupt businessman. He repeatedly lies on his taxes and makes illegal deals with overseas companies. However, he goes around loudly accusing other people of corruption and illegal dealings. According to Freud, Leo is dealing with his anxiety about his own bad behavior through which defense mechanism?")
+
+
+    @commands.command()
+    async def wins(self, ctx, user: str= commands.parameter(default=None, description=": Discord tag to search")):
+        if user is None:
+            user_to_find = str(ctx.author)
+        # If a user is specified, search for the specified user
+        else:
+            user_to_find = user
+        
+        # Look for document with the given name
+        document = self.players_collection.find_one({"name": user_to_find})
+        # Check if no document was found
+        if not document:
+            # User is the author AND no account in the database
+            if user is None:
+                await ctx.send("You don't have an account. Use !create to make one, or !help create for further instruction.")
+                return
+            
+            await ctx.send("We couldn't find an account with that name.")
+            return
+
+        await ctx.send(f"Wins: {document['num_wins']}")
     
+    @commands.command()
+    async def losses(self, ctx, user: str= commands.parameter(default=None, description=": Discord tag to search")):
+        if user is None:
+            user_to_find = str(ctx.author)
+        # If a user is specified, search for the specified user
+        else:
+            user_to_find = user
+        
+        # Look for document with the given name
+        document = self.players_collection.find_one({"name": user_to_find})
+        # Check if no document was found
+        if not document:
+            # User is the author AND no account in the database
+            if user is None:
+                await ctx.send("You don't have an account. Use !create to make one, or !help create for further instruction.")
+                return
+            
+            await ctx.send("We couldn't find an account with that name.")
+            return
+
+        await ctx.send(f"Losses: {document['num_losses']}")
+
+    @commands.command()
+    async def winrate(self, ctx, user: str= commands.parameter(default=None, description=": Discord tag to search")):
+        if user is None:
+            user_to_find = str(ctx.author)
+        # If a user is specified, search for the specified user
+        else:
+            user_to_find = user
+        
+        # Look for document with the given name
+        document = self.players_collection.find_one({"name": user_to_find})
+        # Check if no document was found
+        if not document:
+            # User is the author AND no account in the database
+            if user is None:
+                await ctx.send("You don't have an account. Use !create to make one, or !help create for further instruction.")
+                return
+            
+            await ctx.send("We couldn't find an account with that name.")
+            return
+        
+        if document['num_wins'] == 0:
+            await ctx.send("Your winrate is 0%")
+            return
+        
+        if document['num_losses'] == 0:
+            await ctx.send("Your winrate is 100%")
+            return
+   
+        
+        rate = float(document['num_wins'] / (document['num_wins'] + document['num_losses'])) * 100
+
+        await ctx.send("Your winrate is " + rate + ".")
     
 
 # Connect ProfileCommands to the bot (client)
