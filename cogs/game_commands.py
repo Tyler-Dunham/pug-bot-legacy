@@ -17,8 +17,7 @@ class GameCommands(commands.Cog):
     @commands.command()
     async def map(self, ctx):
         maps = ["Ilios", "Oasis", "Eichenwalde", "Nepal", "Lijiang Tower", "King's Row", "Dorado", "New Queen's Street", "Midtown", "Gibraltar", "Coloseo", "Esperanca", "Numbani", "Havana", "Antarctic Peninsula", "Circuit Royal", "Ilios"]
-        decide = random.randint(0,len(maps)-1)
-        await ctx.send("You will be playing on: " + maps[decide])
+        await ctx.send("You will be playing on: " + random.choice(maps))
 
     @commands.command()
     async def bruh(self, ctx):
@@ -27,7 +26,6 @@ class GameCommands(commands.Cog):
     @commands.command()
     async def moogagod(self, ctx):
         await ctx.send("Leo is a corrupt businessman. He repeatedly lies on his taxes and makes illegal deals with overseas companies. However, he goes around loudly accusing other people of corruption and illegal dealings. According to Freud, Leo is dealing with his anxiety about his own bad behavior through which defense mechanism?")
-
 
     @commands.command()
     async def wins(self, ctx, user: str= commands.parameter(default=None, description=": Discord tag to search")):
