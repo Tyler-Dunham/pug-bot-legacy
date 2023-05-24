@@ -19,47 +19,47 @@ class QueueCommands(commands.Cog):
         self.active_queue = False
 
     def join_queue(self, role, document):
+        # default message to send if player is in queue
+        message = "You are already in queue. Use `!change <role>` to change roles."
+
         # Make sure desired role is open and valid as well as check for duplicate queues
         role = role.lower()
         if (role == "tank"): 
             if (len(self.tank_queue) < 2):
-                if not document in (self.tank_queue or self.dps_queue or self.support_queue):
+                if document not in (self.tank_queue or self.dps_queue or self.support_queue):
                     self.tank_queue.append(document)
                 else:
-                    message = "Already in queue. !change <role> to change roles."
                     return message
             else:
-                message = "Tank queue full"
+                message = "Tank queue full. Use `!status` to check the queued roles."
                 return message
         
         elif (role == "dps"):
             if (len(self.dps_queue) < 4):
-                if not document in (self.tank_queue or self.dps_queue or self.support_queue):
+                if document not in (self.tank_queue or self.dps_queue or self.support_queue):
                     self.dps_queue.append(document)
                 else:
-                    message = "Already in queue. !change <role> to change roles."
                     return message
             else:
-                message = "DPS queue full"
+                message = "DPS queue full. Use `!status` to check the queued roles."
                 return message
 
         elif (role == "support"):
             if (len(self.support_queue) < 4):
-                if not document in (self.tank_queue or self.dps_queue or self.support_queue):
+                if document not in (self.tank_queue or self.dps_queue or self.support_queue):
                     self.support_queue.append(document)
                 else:
-                    message = "Already in queue. !change <role> to change roles."
                     return message
             else:
-                message = "Support queue full"
+                message = "Support queue full. Use `!status` to check the queued roles."
                 return message
         # Invalid role was given
         else:
             message = "Please enter a valid role (tank, dps, support)."
-            return
+            return message
         
 
-        message = "Success! You joined the queue."
+        message = f"Success! You joined the queue as {role}."
         return message
             
 
@@ -73,7 +73,7 @@ class QueueCommands(commands.Cog):
             self.support_queue.remove(document)
         # Player is not in queue
         else:
-            message = "Not in queue. Join queue with !join <role>"
+            message = "You are not in queue. Join with `!join <role>`"
             return message
         
         message = "Successfully left queue!"
@@ -88,14 +88,14 @@ class QueueCommands(commands.Cog):
             document = self.players_collection.find_one({"name": str(author)})
             # User does not have an account
             if not document:
-                await ctx.send(f"{author.mention} You do not have an account. Use !create to make one.")
+                await ctx.send(f"{author.mention} You do not have an account. Use `!create` to make one.")
                 return
             
             # Join queue and get correct message 
             message = self.join_queue(role, document)
             await ctx.send(f"{author.mention} {message}")  
         else:
-            await ctx.send("Queue is not active. Use !start to start the queue.")
+            await ctx.send("Queue is not active. Only PUG Masters can start a queue!")
 
 
     @commands.command(brief=": Leave the PUG Queue", description="Join the PUG Queue with !leave")
@@ -107,7 +107,7 @@ class QueueCommands(commands.Cog):
             document = self.players_collection.find_one({"name": str(author)})
             # User does not have an account
             if not document:
-                await ctx.send(f"{author.mention} You do not have an account. Use !create to make one.")
+                await ctx.send(f"{author.mention} You do not have an account. Use `!create` to make one.")
                 return
             
             # Join queue and get correct message 
@@ -115,7 +115,7 @@ class QueueCommands(commands.Cog):
             await ctx.send(f"{author.mention} {message}") 
 
         else:
-            await ctx.send("Queue is not active. Use !start to start the queue.")
+            await ctx.send("Queue is not active. Only PUG Masters can start a queue!")
 
     @commands.command(brief=": Change role in the PUG Queue", description="Join the PUG Queue with !change <new_role>")
     async def change(self, ctx, role):
@@ -126,7 +126,7 @@ class QueueCommands(commands.Cog):
             document = self.players_collection.find_one({"name": str(author)})
             # User does not have an account
             if not document:
-                await ctx.send(f"{author.mention} You do not have an account. Use !create to make one.")
+                await ctx.send(f"{author.mention} You do not have an account. Use `!create` to make one.")
                 return
             
             # Leave and rejoin queue
@@ -134,7 +134,7 @@ class QueueCommands(commands.Cog):
             message = self.join_queue(role, document)
             await ctx.send(f"{author.mention} {message}")
         else:
-            await ctx.send("Queue is not active. Use !start to start the queue.")
+            await ctx.send("Queue is not active. Only PUG Masters can start a queue!")
     
     @commands.command(aliases=["status"], brief=": Check each queue", description="Check each role queue. !join <role> to join the queue!")
     async def check(self, ctx):
@@ -142,10 +142,10 @@ class QueueCommands(commands.Cog):
             mention = ctx.author.mention
 
             # Send a message of the current status of each queue
-            await ctx.send(f"{mention}\nTank Queue: {len(self.tank_queue)}/2\nDPS Queue: {len(self.dps_queue)}/4\nSupport Queue: {len(self.support_queue)}/4")
-
+            await ctx.send(f"{mention}\nPlayers queued for each role:\n`Tank:      {len(self.tank_queue)}/2\nDPS:       {len(self.dps_queue)}/4\nSupport:   {len(self.support_queue)}/4`")
+            # await ctx.send(f"{mention}\nPlayers queued for each role:\nTank: {len(self.tank_queue)}/2\nDPS: {len(self.dps_queue)}/4\nSupport: {len(self.support_queue)}/4")
         else:
-            await ctx.send("Queue is not active. Use !start to start the queue.")
+            await ctx.send("Queue is not active. Only PUG Masters can start a queue!")
 
 
     # Command requires PUG Master role -> admin only
@@ -154,7 +154,7 @@ class QueueCommands(commands.Cog):
     async def start(self, ctx):
         # Start Queue
         self.active_queue = True
-        await ctx.send("Queue has been started. Join with !join <role>, change roles with !change <new_role>, and leave the queue with !leave.")
+        await ctx.send("Queue has been started.\nJoin with `!join <role>`\nChange roles with `!change <new_role>`\nLeave the queue with `!leave.`")
 
 
     # Command requires PUG Master role -> admin only
