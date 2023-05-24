@@ -16,6 +16,7 @@ class QueueCommands(commands.Cog):
         self.tank_queue = []
         self.dps_queue = []
         self.support_queue = []
+        self.active_queue = False
 
     def join_queue(self, role, document):
         # Make sure desired role is open and valid as well as check for duplicate queues
@@ -80,58 +81,78 @@ class QueueCommands(commands.Cog):
     
     @commands.command(brief=": Join the PUG Queue", description="Join the PUG Queue with !join <role>")
     async def join(self, ctx, role):
-        author = ctx.author
+        if self.active_queue:
+            author = ctx.author
 
-        # Check if user has an account
-        document = self.players_collection.find_one({"name": str(author)})
-        # User does not have an account
-        if not document:
-            await ctx.send(f"{author.mention} You do not have an account. Use !create to make one.")
-            return
-        
-        # Join queue and get correct message 
-        message = self.join_queue(role, document)
-        await ctx.send(f"{author.mention} {message}")  
+            # Check if user has an account
+            document = self.players_collection.find_one({"name": str(author)})
+            # User does not have an account
+            if not document:
+                await ctx.send(f"{author.mention} You do not have an account. Use !create to make one.")
+                return
+            
+            # Join queue and get correct message 
+            message = self.join_queue(role, document)
+            await ctx.send(f"{author.mention} {message}")  
+        else:
+            await ctx.send("Queue is not active. Use !start to start the queue.")
 
 
     @commands.command(brief=": Leave the PUG Queue", description="Join the PUG Queue with !leave")
     async def leave(self, ctx):
-        author = ctx.author
+        if self.active_queue:
+            author = ctx.author
 
-        # Check if user has an account
-        document = self.players_collection.find_one({"name": str(author)})
-        # User does not have an account
-        if not document:
-            await ctx.send(f"{author.mention} You do not have an account. Use !create to make one.")
-            return
-        
-        # Join queue and get correct message 
-        message = self.leave_queue(document)
-        await ctx.send(f"{author.mention} {message}") 
+            # Check if user has an account
+            document = self.players_collection.find_one({"name": str(author)})
+            # User does not have an account
+            if not document:
+                await ctx.send(f"{author.mention} You do not have an account. Use !create to make one.")
+                return
+            
+            # Join queue and get correct message 
+            message = self.leave_queue(document)
+            await ctx.send(f"{author.mention} {message}") 
+
+        else:
+            await ctx.send("Queue is not active. Use !start to start the queue.")
 
     @commands.command(brief=": Change role in the PUG Queue", description="Join the PUG Queue with !change <new_role>")
     async def change(self, ctx, role):
-        author = ctx.author
+        if self.active_queue:
+            author = ctx.author
 
-        # Check if user has an account
-        document = self.players_collection.find_one({"name": str(author)})
-        # User does not have an account
-        if not document:
-            await ctx.send(f"{author.mention} You do not have an account. Use !create to make one.")
-            return
-        
-        # Leave and rejoin queue
-        self.leave_queue(document)
-        message = self.join_queue(role, document)
-        await ctx.send(f"{author.mention} {message}")
+            # Check if user has an account
+            document = self.players_collection.find_one({"name": str(author)})
+            # User does not have an account
+            if not document:
+                await ctx.send(f"{author.mention} You do not have an account. Use !create to make one.")
+                return
+            
+            # Leave and rejoin queue
+            self.leave_queue(document)
+            message = self.join_queue(role, document)
+            await ctx.send(f"{author.mention} {message}")
+        else:
+            await ctx.send("Queue is not active. Use !start to start the queue.")
     
     @commands.command(brief=": Check each queue", description="Check each role queue. !join <role> to join the queue!")
     async def check(self, ctx):
-        mention = ctx.author.mention
+        if self.active_queue:
+            mention = ctx.author.mention
 
-        # Send a message of the current status of each queue
-        await ctx.send(f"{mention}\nTank Queue: {len(self.tank_queue)}/2\nDPS Queue: {len(self.dps_queue)}/4\nSupport Queue: {len(self.support_queue)}/4")
-    
+            # Send a message of the current status of each queue
+            await ctx.send(f"{mention}\nTank Queue: {len(self.tank_queue)}/2\nDPS Queue: {len(self.dps_queue)}/4\nSupport Queue: {len(self.support_queue)}/4")
+
+        else:
+            await ctx.send("Queue is not active. Use !start to start the queue.")
+
+
+    @commands.command(brief=": Start the queue", description="Start the queue and allow matchmaking to begin automatically.")
+    async def start(self, ctx):
+        # Start Queue
+        self.active_queue = True
+        await ctx.send("Queue has been started. Join with !join <role>, change roles with !change <new_role>, and leave the queue with !leave.")
 
 # Connect QueueCommands to the bot (client)
 async def setup(client):
