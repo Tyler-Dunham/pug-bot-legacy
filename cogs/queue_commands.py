@@ -136,7 +136,7 @@ class QueueCommands(commands.Cog):
         else:
             await ctx.send("Queue is not active. Use !start to start the queue.")
     
-    @commands.command(brief=": Check each queue", description="Check each role queue. !join <role> to join the queue!")
+    @commands.command(aliases=["status"], brief=": Check each queue", description="Check each role queue. !join <role> to join the queue!")
     async def check(self, ctx):
         if self.active_queue:
             mention = ctx.author.mention
@@ -148,15 +148,18 @@ class QueueCommands(commands.Cog):
             await ctx.send("Queue is not active. Use !start to start the queue.")
 
 
+    # Command requires PUG Master role -> admin only
     @commands.command(brief=": Start the queue", description="Start the queue and allow matchmaking to begin automatically.")
+    @commands.has_role("PUG Master")
     async def start(self, ctx):
         # Start Queue
         self.active_queue = True
         await ctx.send("Queue has been started. Join with !join <role>, change roles with !change <new_role>, and leave the queue with !leave.")
 
 
-
+    # Command requires PUG Master role -> admin only
     @commands.command(brief=": End all queue processes", description="Stop all queue related processes and cleanup for the next game.")
+    @commands.has_role("PUG Master")
     async def end(self, ctx):
         # End Queue
         self.active_queue = False
