@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 from db import connect_db
 import json
+import random
 
 class GameCommands(commands.Cog):
     with open('KEYS.json', 'r') as f:
@@ -16,6 +17,12 @@ class GameCommands(commands.Cog):
     @commands.command()
     async def pong(self, ctx):
         await ctx.send("pong")
+
+    @commands.command()
+    async def map(self, ctx):
+        maps = ["Ilios", "Oasis", "Eichenwalde", "Nepal", "Lijiang Tower", "King's Row", "Dorado", "New Queen's Street", "Midtown", "Gibraltar", "Coloseo", "Esperanca", "Numbani", "Havana", "Antarctic Peninsula", "Circuit Royal", "Ilios"]
+        decide = random.randint(0,len(maps)-1)
+        await ctx.send("You will be playing on: " + maps[decide])
 
 
 # Connect ProfileCommands to the bot (client)
