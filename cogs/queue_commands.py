@@ -63,12 +63,14 @@ class QueueCommands(commands.Cog):
             
 
     def leave_queue(self, document):
+        # Find what queue the player is in and leave it.
         if document in self.tank_queue:
             self.tank_queue.remove(document)
         elif document in self.dps_queue:
             self.dps_queue.remove(document)
         elif document in self.support_queue:
             self.support_queue.remove(document)
+        # Player is not in queue
         else:
             message = "Not in queue. Join queue with !join <role>"
             return message
@@ -118,6 +120,7 @@ class QueueCommands(commands.Cog):
             await ctx.send(f"{author.mention} You do not have an account. Use !create to make one.")
             return
         
+        # Leave and rejoin queue
         self.leave_queue(document)
         message = self.join_queue(role, document)
         await ctx.send(f"{author.mention} {message}")
@@ -126,6 +129,7 @@ class QueueCommands(commands.Cog):
     async def check(self, ctx):
         mention = ctx.author.mention
 
+        # Send a message of the current status of each queue
         await ctx.send(f"{mention}\nTank Queue: {len(self.tank_queue)}/2\nDPS Queue: {len(self.dps_queue)}/4\nSupport Queue: {len(self.support_queue)}/4")
     
 
