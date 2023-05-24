@@ -154,6 +154,18 @@ class QueueCommands(commands.Cog):
         self.active_queue = True
         await ctx.send("Queue has been started. Join with !join <role>, change roles with !change <new_role>, and leave the queue with !leave.")
 
+
+
+    @commands.command(brief=": End all queue processes", description="Stop all queue related processes and cleanup for the next game.")
+    async def end(self, ctx):
+        # End Queue
+        self.active_queue = False
+        await ctx.send("The game has ended.")
+
+        #TODO: update all elos (+25 for winning team, -25 for losing team)
+        #TODO: move users back to #Draft channel
+        #TODO: cleanup (clear queues)
+
 # Connect QueueCommands to the bot (client)
 async def setup(client):
     await client.add_cog(QueueCommands(client))
