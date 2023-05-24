@@ -58,7 +58,8 @@ class ProfileCommands(commands.Cog):
             "name": author,
             "tank": tank_elo,
             "dps": dps_elo,
-            "support": support_elo
+            "support": support_elo,
+            "num_wins": 0
         }
 
         # Insert the document
