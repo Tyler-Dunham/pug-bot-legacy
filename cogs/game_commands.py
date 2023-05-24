@@ -24,8 +24,11 @@ class GameCommands(commands.Cog):
     async def bruh(self, ctx):
         await ctx.send("bruh")
 
+    @commands.command()
+    async def moogagod(self, ctx):
+        await ctx.send("Leo is a corrupt businessman. He repeatedly lies on his taxes and makes illegal deals with overseas companies. However, he goes around loudly accusing other people of corruption and illegal dealings. According to Freud, Leo is dealing with his anxiety about his own bad behavior through which defense mechanism?")
     
-
+    
 
 # Connect ProfileCommands to the bot (client)
 async def setup(client):
