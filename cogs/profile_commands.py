@@ -1,10 +1,11 @@
 import discord
 from discord.ext import commands
 from functions.db import connect_db
+import functions._profile
 import json
 
 #Profile commands 
-class ProfileCommands(commands.Cog):
+class ProfileCommands(commands.Cog, functions._profile.ProfileMixin):
     with open('KEYS.json', 'r') as f:
         data = json.load(f)
 
@@ -12,22 +13,7 @@ class ProfileCommands(commands.Cog):
     def __init__(self, client):
         self.client = client
         self.db = connect_db(self.data)
-        self.players_collection = self.db["players"]
-
-    def check_valid_elo(self, elos: list):
-        new_elos = []
-
-        # Check if elo is in range
-        for elo in elos:
-            if (elo) not in range(0, 5001):          
-                return None
-            # Finalize elos in new_elos (Default elos if 0)
-            elo = elo if elo != 0 else 2500
-            new_elos.append(elo)
-        
-        return new_elos
-      
-
+        self.players_collection = self.db["players"]   
 
     # Command for users to create accounts on our database
     @commands.command(brief=": Create your profile", description="Create your profile with !create <tank_elo> <dps_elo> <support_elo>")

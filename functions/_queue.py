@@ -1,5 +1,5 @@
 class QueueMixin: # Mixin allows us to separate our methods from queue_commands.py. 
-             # We are simply adding these functions to the QueueCommands class but storing them in this file.
+                  # We are simply adding these functions to the QueueCommands class but storing them in this file.
 
     def join_queue(self, role, document):
             # default message to send if player is in queue
