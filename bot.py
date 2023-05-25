@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 import json
 import os
-from db import connect_db
+from functions.db import connect_db
 
 # Open keys
 with open('KEYS.json', 'r') as f:

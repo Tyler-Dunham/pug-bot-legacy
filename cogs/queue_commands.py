@@ -1,10 +1,11 @@
-import random
 import discord
 from discord.ext import commands
-from db import connect_db
+from functions.db import connect_db
 import json
+from functions.matchmaker import mm_first_draft
+import functions._queue
 
-class QueueCommands(commands.Cog):
+class QueueCommands(commands.Cog, functions._queue.QueueMixin):
     with open('KEYS.json', 'r') as f:
         data = json.load(f)
 
@@ -18,67 +19,7 @@ class QueueCommands(commands.Cog):
         self.support_queue = []
         self.active_queue = False
 
-    def join_queue(self, role, document):
-        # default message to send if player is in queue
-        message = "You are already in queue. Use `!change <role>` to change roles."
 
-        # Make sure desired role is open and valid as well as check for duplicate queues
-        role = role.lower()
-        if (role == "tank"): 
-            if (len(self.tank_queue) < 2):
-                if document not in (self.tank_queue or self.dps_queue or self.support_queue):
-                    self.tank_queue.append(document)
-                else:
-                    return message
-            else:
-                message = "Tank queue full. Use `!status` to check the queued roles."
-                return message
-        
-        elif (role == "dps"):
-            if (len(self.dps_queue) < 4):
-                if document not in (self.tank_queue or self.dps_queue or self.support_queue):
-                    self.dps_queue.append(document)
-                else:
-                    return message
-            else:
-                message = "DPS queue full. Use `!status` to check the queued roles."
-                return message
-
-        elif (role == "support"):
-            if (len(self.support_queue) < 4):
-                if document not in (self.tank_queue or self.dps_queue or self.support_queue):
-                    self.support_queue.append(document)
-                else:
-                    return message
-            else:
-                message = "Support queue full. Use `!status` to check the queued roles."
-                return message
-        # Invalid role was given
-        else:
-            message = "Please enter a valid role (tank, dps, support)."
-            return message
-        
-
-        message = f"Success! You joined the queue as {role}."
-        return message
-            
-
-    def leave_queue(self, document):
-        # Find what queue the player is in and leave it.
-        if document in self.tank_queue:
-            self.tank_queue.remove(document)
-        elif document in self.dps_queue:
-            self.dps_queue.remove(document)
-        elif document in self.support_queue:
-            self.support_queue.remove(document)
-        # Player is not in queue
-        else:
-            message = "You are not in queue. Join with `!join <role>`"
-            return message
-        
-        message = "Successfully left queue!"
-        return message
-    
     @commands.command(brief=": Join the PUG Queue", description="Join the PUG Queue with !join <role>")
     async def join(self, ctx, role):
         if self.active_queue:
@@ -94,6 +35,16 @@ class QueueCommands(commands.Cog):
             # Join queue and get correct message 
             message = self.join_queue(role, document)
             await ctx.send(f"{author.mention} {message}")  
+
+            # Check if queue is filled from most recent join 
+            if ( len(self.tank_queue) + len(self.dps_queue) + len(self.support_queue) ) == 2:
+                await ctx.send("Matchmaking has started. Queue is closing and matchmaking will begin shortly.")
+                self.active_queue = False
+
+                # TODO: call mm_first_draft() from matchmaker.py
+                # TODO: Move people to their team's channel 
+                # TODO: Auto-pick a random map
+
         else:
             await ctx.send("Queue is not active. Only PUG Masters can start a queue!")
 
@@ -142,17 +93,17 @@ class QueueCommands(commands.Cog):
             mention = ctx.author.mention
 
             # Send a message of the current status of each queue
-            await ctx.send(f"{mention}\nPlayers queued for each role:\n`Tank:      {len(self.tank_queue)}/2\nDPS:       {len(self.dps_queue)}/4\nSupport:   {len(self.support_queue)}/4`")
-            # await ctx.send(f"{mention}\nPlayers queued for each role:\nTank: {len(self.tank_queue)}/2\nDPS: {len(self.dps_queue)}/4\nSupport: {len(self.support_queue)}/4")
+            await ctx.send(f"{mention}\nPlayers queued for each role:\n```Tank:      {len(self.tank_queue)}/2\nDPS:       {len(self.dps_queue)}/4\nSupport:   {len(self.support_queue)}/4```")
+
         else:
             await ctx.send("Queue is not active. Only PUG Masters can start a queue!")
 
 
     # Command requires PUG Master role -> admin only
-    @commands.command(brief=": Start the queue", description="Start the queue and allow matchmaking to begin automatically.")
+    @commands.command(aliases=["open"], brief=": Start the queue", description="Start the queue and allow matchmaking to begin automatically.")
     @commands.has_role("PUG Master")
     async def start(self, ctx):
-        # Start Queue
+        # Open Queue
         self.active_queue = True
         await ctx.send("Queue has been started.\nJoin with `!join <role>`\nChange roles with `!change <new_role>`\nLeave the queue with `!leave.`")
 
@@ -160,14 +111,19 @@ class QueueCommands(commands.Cog):
     # Command requires PUG Master role -> admin only
     @commands.command(brief=": End all queue processes", description="Stop all queue related processes and cleanup for the next game.")
     @commands.has_role("PUG Master")
-    async def end(self, ctx):
+    async def end(self, ctx, winning_team: int):
         # End Queue
-        self.active_queue = False
-        await ctx.send("The game has ended.")
+        if self.active_queue == True:
+            self.active_queue = False
+            await ctx.send("The game has ended.")        
 
         #TODO: update all elos (+25 for winning team, -25 for losing team)
         #TODO: move users back to #Draft channel
         #TODO: cleanup (clear queues)
+        
+        else:
+            await ctx.send("There is not an ongoing game.")
+            return
 
 # Connect QueueCommands to the bot (client)
 async def setup(client):

@@ -1,7 +1,7 @@
 import random
 import discord
 from discord.ext import commands
-from db import connect_db
+from functions.db import connect_db
 import json
 
 class GameCommands(commands.Cog):
