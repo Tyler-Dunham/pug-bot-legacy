@@ -2,47 +2,47 @@ class QueueMixin: # Mixin allows us to separate our methods from queue_commands.
                   # We are simply adding these functions to the QueueCommands class but storing them in this file.
 
     def join_queue(self, role, document):
-            # default message to send if player is in queue
-            message = "You are already in queue. Use `!change <role>` to change roles."
+            # default message to send (success)
+            message = f"Success! You joined the queue as {role}."
 
             # Make sure desired role is open and valid as well as check for duplicate queues
 
             role = role.lower() # Get role in lowercase for comparison below
-            # CHECK IF ALREADY IN QUEUE
-            if document not in (self.tank_queue or self.dps_queue or self.support_queue):
-                # TANK ROLE
-                if (role == "tank"): 
-                    if (len(self.tank_queue) < 2):
-                        self.tank_queue.append(document)
-                    else:
-                        message = "Tank queue full. Use `!status` to check the queued roles."
-                        return message
-                
-                # DPS ROLE
-                elif (role == "dps"):
-                    if (len(self.dps_queue) < 4):
-                        self.dps_queue.append(document)
-                    else:
-                        message = "DPS queue full. Use `!status` to check the queued roles."
-                        return message
 
-                # SUPPORT ROLE
-                elif (role == "support"):
-                    if (len(self.support_queue) < 4):
-                        self.support_queue.append(document)
-                    else:
-                        message = "Support queue full. Use `!status` to check the queued roles."
-                        return message
-                    
-                # Invalid role was given
-                else:
-                    message = "Please enter a valid role (tank, dps, support)."
-                    return message
-            else:
+            # CHECK IF ALREADY IN QUEUE
+            if document in (self.tank_queue or self.dps_queue or self.support_queue):
+                message = "You are already in queue. Use `!change <role>` to change roles."
                 return message
             
+            # TANK ROLE
+            if (role == "tank"): 
+                if (len(self.tank_queue) < 2):
+                    self.tank_queue.append(document)
+                else:
+                    message = "Tank queue full. Use `!status` to check the queued roles."
+                    return message
+            
+            # DPS ROLE
+            elif (role == "dps"):
+                if (len(self.dps_queue) < 4):
+                    self.dps_queue.append(document)
+                else:
+                    message = "DPS queue full. Use `!status` to check the queued roles."
+                    return message
 
-            message = f"Success! You joined the queue as {role}."
+            # SUPPORT ROLE
+            elif (role == "support"):
+                if (len(self.support_queue) < 4):
+                    self.support_queue.append(document)
+                else:
+                    message = "Support queue full. Use `!status` to check the queued roles."
+                    return message
+                
+            # INVALID ROLE WAS GIVEN
+            else:
+                message = "Please enter a valid role (tank, dps, support)."
+                return message
+            
             return message
 
 
