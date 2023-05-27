@@ -139,7 +139,6 @@ class QueueCommands(commands.Cog, functions._queue.QueueMixin):
             # Congratulate Game winner
             if winning_team == 0:
                 await ctx.send(f"The game has ended in a draw.")
-                return
             else:
                 await ctx.send(f"The game has ended. Team {winning_team} wins!")        
 
