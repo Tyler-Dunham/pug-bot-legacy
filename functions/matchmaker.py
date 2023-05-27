@@ -33,7 +33,7 @@ def matchmaker(tank, dps, support):
         team1_average = (team1[0]["tank"] + team1[1][0]["dps"] + team1[1][1]["dps"] + team1[2][0]["support"] + team1[2][1]["support"])/5
         team2_average = (team1[0]["tank"] + team2[1][0]["dps"] + team2[1][1]["dps"] + team2[2][0]["support"] + team2[2][1]["support"])/5
         difference = abs(team1_average - team2_average)
-        if difference <= 0:
+        if difference <= 200:
             acceptable_teams.append((flatten_tuple(team1), team1_average, flatten_tuple(team2), team2_average, difference))
         if difference < smallest_difference:
             smallest_difference = difference
