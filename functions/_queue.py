@@ -6,39 +6,39 @@ class QueueMixin: # Mixin allows us to separate our methods from queue_commands.
             message = "You are already in queue. Use `!change <role>` to change roles."
 
             # Make sure desired role is open and valid as well as check for duplicate queues
-            role = role.lower()
-            if (role == "tank"): 
-                if (len(self.tank_queue) < 2):
-                    if document not in (self.tank_queue or self.dps_queue or self.support_queue):
+
+            role = role.lower() # Get role in lowercase for comparison below
+            # CHECK IF ALREADY IN QUEUE
+            if document not in (self.tank_queue or self.dps_queue or self.support_queue):
+                # TANK ROLE
+                if (role == "tank"): 
+                    if (len(self.tank_queue) < 2):
                         self.tank_queue.append(document)
                     else:
+                        message = "Tank queue full. Use `!status` to check the queued roles."
                         return message
-                else:
-                    message = "Tank queue full. Use `!status` to check the queued roles."
-                    return message
-            
-            elif (role == "dps"):
-                if (len(self.dps_queue) < 4):
-                    if document not in (self.tank_queue or self.dps_queue or self.support_queue):
+                
+                # DPS ROLE
+                elif (role == "dps"):
+                    if (len(self.dps_queue) < 4):
                         self.dps_queue.append(document)
                     else:
+                        message = "DPS queue full. Use `!status` to check the queued roles."
                         return message
-                else:
-                    message = "DPS queue full. Use `!status` to check the queued roles."
-                    return message
 
-            elif (role == "support"):
-                if (len(self.support_queue) < 4):
-                    if document not in (self.tank_queue or self.dps_queue or self.support_queue):
+                # SUPPORT ROLE
+                elif (role == "support"):
+                    if (len(self.support_queue) < 4):
                         self.support_queue.append(document)
                     else:
+                        message = "Support queue full. Use `!status` to check the queued roles."
                         return message
+                    
+                # Invalid role was given
                 else:
-                    message = "Support queue full. Use `!status` to check the queued roles."
+                    message = "Please enter a valid role (tank, dps, support)."
                     return message
-            # Invalid role was given
             else:
-                message = "Please enter a valid role (tank, dps, support)."
                 return message
             
 
