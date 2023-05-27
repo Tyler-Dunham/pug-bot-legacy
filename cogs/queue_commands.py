@@ -14,14 +14,20 @@ class QueueCommands(commands.Cog, functions._queue.QueueMixin):
         self.client = client
         self.db = connect_db(self.data)
         self.players_collection = self.db["players"]
+
         self.tank_queue = []
         self.dps_queue = []
         self.support_queue = []
-        self.active_queue = False
 
+        self.active_queue = False
+        self.active_game = False
 
     @commands.command(brief=": Join the PUG Queue", description="Join the PUG Queue with !join <role>")
     async def join(self, ctx, role):
+        """
+        It is important to note this join command also handles 
+        automayically starting the matchmaker when the queue is filled.
+        """
         if self.active_queue:
             author = ctx.author
 
@@ -37,11 +43,14 @@ class QueueCommands(commands.Cog, functions._queue.QueueMixin):
             await ctx.send(f"{author.mention} {message}")  
 
             # Check if queue is filled from most recent join 
-            if ( len(self.tank_queue) + len(self.dps_queue) + len(self.support_queue) ) == 2:
+            if ( len(self.tank_queue) + len(self.dps_queue) + len(self.support_queue) ) == 1:
                 await ctx.send("Matchmaking has started. Queue is closing and matchmaking will begin shortly.")
-                self.active_queue = False
 
-                # TODO: call mm_first_draft() from matchmaker.py
+                # End queue, start game
+                self.active_queue = False
+                self.active_game = True
+
+                # TODO: Call display_teams(). This function both calls and displays mm_draft()
                 # TODO: Move people to their team's channel 
                 # TODO: Auto-pick a random map
 
@@ -89,6 +98,7 @@ class QueueCommands(commands.Cog, functions._queue.QueueMixin):
     
     @commands.command(aliases=["status"], brief=": Check each queue", description="Check each role queue. !join <role> to join the queue!")
     async def check(self, ctx):
+        # Check if there is an ongoing queue
         if self.active_queue:
             mention = ctx.author.mention
 
@@ -103,19 +113,35 @@ class QueueCommands(commands.Cog, functions._queue.QueueMixin):
     @commands.command(aliases=["open"], brief=": Start the queue", description="Start the queue and allow matchmaking to begin automatically.")
     @commands.has_role("PUG Master")
     async def start(self, ctx):
-        # Open Queue
-        self.active_queue = True
-        await ctx.send("Queue has been started.\nJoin with `!join <role>`\nChange roles with `!change <new_role>`\nLeave the queue with `!leave.`")
+        # Open Queue if closed
+        if self.active_queue == False:
+            self.active_queue = True
+            await ctx.send("Queue has been started.\nJoin with `!join <role>`\nChange roles with `!change <new_role>`\nLeave the queue with `!leave.`")
+        # Queue is already open
+        else:
+            await ctx.send("There is already an ongoing queue.")
 
 
     # Command requires PUG Master role -> admin only
     @commands.command(brief=": End all queue processes", description="Stop all queue related processes and cleanup for the next game.")
     @commands.has_role("PUG Master")
     async def end(self, ctx, winning_team: int):
-        # End Queue
-        if self.active_queue == True:
-            self.active_queue = False
-            await ctx.send("The game has ended.")        
+        # Check if there is actually an ongoing game
+        if self.active_game == True:
+            # End game
+            self.active_game = False
+
+            # Clear Queues
+            self.tank_queue.clear()
+            self.dps_queue.clear()
+            self.support_queue.clear()
+
+            # Congratulate Game winner
+            if winning_team == 0:
+                await ctx.send(f"The game has ended in a draw.")
+                return
+            else:
+                await ctx.send(f"The game has ended. Team {winning_team} wins!")        
 
         #TODO: update all elos (+25 for winning team, -25 for losing team)
         #TODO: move users back to #Draft channel
