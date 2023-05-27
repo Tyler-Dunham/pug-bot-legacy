@@ -64,5 +64,20 @@ class QueueMixin: # Mixin allows us to separate our methods from queue_commands.
         return message
     
 
-    def get_name(self, doc):
-        return doc['name'].split('#')[0]
+    def get_name(self, doc, mention=True):
+        if mention:
+            return f"<@{doc['_id']}>"
+        else:
+            return doc['name'].split('#')[0]
+    
+    def display_teams(self, team1, team2, team1_average, team2_average):
+        # team are represented in a tuple -> tank, first_dps, second_dps, first_support, second_support
+
+        # return the string to print out
+        return (
+        f"---------------------------------------\n" \
+        f"Team 1:\nTank: {self.get_name(team1[0])}\nDPS: {self.get_name(team1[1])} and {self.get_name(team1[2])}\nSupport: {self.get_name(team1[3])} and {self.get_name(team1[4])}\n" \
+        f"\nTeam 2:\nTank: {self.get_name(team2[0])}\nDPS: {self.get_name(team2[1])} and {self.get_name(team2[2])}\nSupport: {self.get_name(team2[3])} and {self.get_name(team2[4])}\n" \
+        f"\nTeam 1 Average SR: {round(team1_average)}\nTeam 2 Average SR: {round(team2_average)}\n" \
+        f"---------------------------------------"
+        )

@@ -44,7 +44,7 @@ class QueueCommands(commands.Cog, functions._queue.QueueMixin):
 
             # Check if queue is filled from most recent join 
             if ( len(self.tank_queue) + len(self.dps_queue) + len(self.support_queue) ) == 10:
-                await ctx.send("Matchmaking has started. Queue is closing and matchmaking will begin shortly.\n")
+                await ctx.send("10th person has joined and the queue is now closed.\nMatchmaking...\n")
 
                 # End queue, start game
                 self.active_queue = False
@@ -52,19 +52,23 @@ class QueueCommands(commands.Cog, functions._queue.QueueMixin):
 
                 # call matchmaker and destructer to get the tank, dps, and support for each team
                 team1, team1_average, team2, team2_average, difference = matchmaker(self.tank_queue, self.dps_queue, self.support_queue)
-                team1_tank, team1_dps, team1_support = team1
-                team2_tank, team2_dps, team2_support = team2
+                # display the teams
+                await ctx.send(self.display_teams(team1, team2, team1_average, team2_average))
 
-                # create the string to print out
-                teams_string = (
-                f"Team 1:\nTank: {self.get_name(team1_tank)}\nDPS: {self.get_name(team1_dps[0])} and {self.get_name(team1_dps[1])}\nSupport: {self.get_name(team1_support[0])} and {self.get_name(team1_support[1])}\n" \
-                f"\nTeam 2:\nTank: {self.get_name(team2_tank)}\nDPS: {self.get_name(team2_dps[0])} and {self.get_name(team2_dps[1])}\nSupport: {self.get_name(team2_support[0])} and {self.get_name(team2_support[1])}\n" \
-                f"\nTeam 1 Average SR: {team1_average}\nTeam 2 Average SR: {team2_average}"
-                )
+                # Move players to their team's channel 
+                await ctx.send("Moving players to voice channels...")
 
-                await ctx.send(teams_string)
-
-                # TODO: Move people to their team's channel 
+                guild = self.client.get_guild(ctx.guild.id)
+                channel = self.client.get_channel(1107126277971906600) 
+                for player in team1:
+                    print(player['_id'])
+                    member = guild.get_member(player['_id'])
+                    await member.move_to(channel)
+                channel = self.client.get_channel(1107126310502932501) 
+                for player in team2:
+                    member = guild.get_member(player['_id'])
+                    await member.move_to(channel)
+                
                 # TODO: Auto-pick a random map
 
         else:
@@ -134,6 +138,18 @@ class QueueCommands(commands.Cog, functions._queue.QueueMixin):
         else:
             await ctx.send("There is already an ongoing queue.")
 
+    # Command requires PUG Master role -> admin only
+    @commands.command(aliases=["close"], brief=": Stops the queue", description="Stop the queue.")
+    @commands.has_role("PUG Master")
+    async def stop(self, ctx):
+        # Open Queue if closed
+        if self.active_queue == True:
+            self.active_queue = False
+            await ctx.send("Queue has been stopped.")
+        # Queue is already open
+        else:
+            await ctx.send("There is not an ongoing queue.")
+
 
     # Command requires PUG Master role -> admin only
     @commands.command(brief=": End all queue processes", description="Stop all queue related processes and cleanup for the next game.")
@@ -143,6 +159,13 @@ class QueueCommands(commands.Cog, functions._queue.QueueMixin):
         if self.active_game == True:
             # End game
             self.active_game = False
+
+            # move all users that were in the queue back into general voice chat
+            guild = self.client.get_guild(ctx.guild.id)
+            channel = self.client.get_channel(1107126171285594145) 
+            for player in self.tank_queue + self.dps_queue + self.support_queue:
+                member = guild.get_member(player['_id'])
+                await member.move_to(channel)
 
             # Clear Queues
             self.tank_queue.clear()
@@ -155,13 +178,9 @@ class QueueCommands(commands.Cog, functions._queue.QueueMixin):
             else:
                 await ctx.send(f"The game has ended. Team {winning_team} wins!")        
 
-        #TODO: update all elos (+25 for winning team, -25 for losing team)
-        #TODO: move users back to #Draft channel
-        #TODO: cleanup (clear queues)
-        
+        #TODO: update all elos (+25 for winning team, -25 for losing team)        
         else:
             await ctx.send("There is not an ongoing game.")
-            return
 
 # Connect QueueCommands to the bot (client)
 async def setup(client):
