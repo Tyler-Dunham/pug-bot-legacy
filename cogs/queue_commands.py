@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 from functions.db import connect_db
 import json
-from functions.matchmaker import mm_first_draft
+from functions.matchmaker import matchmaker
 import functions._queue
 
 class QueueCommands(commands.Cog, functions._queue.QueueMixin):
@@ -43,14 +43,27 @@ class QueueCommands(commands.Cog, functions._queue.QueueMixin):
             await ctx.send(f"{author.mention} {message}")  
 
             # Check if queue is filled from most recent join 
-            if ( len(self.tank_queue) + len(self.dps_queue) + len(self.support_queue) ) == 1:
-                await ctx.send("Matchmaking has started. Queue is closing and matchmaking will begin shortly.")
+            if ( len(self.tank_queue) + len(self.dps_queue) + len(self.support_queue) ) == 10:
+                await ctx.send("Matchmaking has started. Queue is closing and matchmaking will begin shortly.\n")
 
                 # End queue, start game
                 self.active_queue = False
                 self.active_game = True
 
-                # TODO: Call display_teams(). This function both calls and displays mm_draft()
+                # call matchmaker and destructer to get the tank, dps, and support for each team
+                team1, team1_average, team2, team2_average, difference = matchmaker(self.tank_queue, self.dps_queue, self.support_queue)
+                team1_tank, team1_dps, team1_support = team1
+                team2_tank, team2_dps, team2_support = team2
+
+                # create the string to print out
+                teams_string = (
+                f"Team 1:\nTank: {self.get_name(team1_tank)}\nDPS: {self.get_name(team1_dps[0])} and {self.get_name(team1_dps[1])}\nSupport: {self.get_name(team1_support[0])} and {self.get_name(team1_support[1])}\n" \
+                f"\nTeam 2:\nTank: {self.get_name(team2_tank)}\nDPS: {self.get_name(team2_dps[0])} and {self.get_name(team2_dps[1])}\nSupport: {self.get_name(team2_support[0])} and {self.get_name(team2_support[1])}\n" \
+                f"\nTeam 1 Average SR: {team1_average}\nTeam 2 Average SR: {team2_average}"
+                )
+
+                await ctx.send(teams_string)
+
                 # TODO: Move people to their team's channel 
                 # TODO: Auto-pick a random map
 

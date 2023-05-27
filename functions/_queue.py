@@ -62,3 +62,7 @@ class QueueMixin: # Mixin allows us to separate our methods from queue_commands.
         
         message = "Successfully left queue!"
         return message
+    
+
+    def get_name(self, doc):
+        return doc['name'].split('#')[0]

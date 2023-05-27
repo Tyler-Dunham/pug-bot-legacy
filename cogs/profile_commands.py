@@ -113,7 +113,7 @@ class ProfileCommands(commands.Cog, functions._profile.ProfileMixin):
             
             await ctx.send("We couldn't find an account with that name.")
             return
-
+        
         await ctx.send(f"{user_to_find}\nTank: {document['tank']} | DPS: {document['dps']} | Support: {document['support']}")
 
     
