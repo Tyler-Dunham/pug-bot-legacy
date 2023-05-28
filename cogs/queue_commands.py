@@ -4,6 +4,8 @@ from functions.db import connect_db
 import json
 from functions.matchmaker import matchmaker
 import functions._queue
+import time
+import random
 
 class QueueCommands(commands.Cog, functions._queue.QueueMixin):
     with open('KEYS.json', 'r') as f:
@@ -56,12 +58,17 @@ class QueueCommands(commands.Cog, functions._queue.QueueMixin):
                 await ctx.send(self.display_teams(team1, team2, team1_average, team2_average))
 
                 # Move players to their team's channel 
-                await ctx.send("Moving players to voice channels...")
+                await ctx.send("Moving players to voice channels in 3...")
+                time.sleep(1)
+                await ctx.send("Moving players to voice channels in 2...")
+                time.sleep(1)
+                await ctx.send("Moving players to voice channels in 1...")
+                time.sleep(1)
+                await ctx.send("Moving players to voice channels.")
 
                 guild = self.client.get_guild(ctx.guild.id)
                 channel = self.client.get_channel(1107126277971906600) 
                 for player in team1:
-                    print(player['_id'])
                     member = guild.get_member(player['_id'])
                     await member.move_to(channel)
                 channel = self.client.get_channel(1107126310502932501) 
@@ -69,7 +76,9 @@ class QueueCommands(commands.Cog, functions._queue.QueueMixin):
                     member = guild.get_member(player['_id'])
                     await member.move_to(channel)
                 
-                # TODO: Auto-pick a random map
+                # Auto-pick a random map
+                maps = ["Ilios", "Oasis", "Eichenwalde", "Nepal", "Lijiang Tower", "King's Row", "Dorado", "New Queen's Street", "Midtown", "Gibraltar", "Coloseo", "Esperanca", "Numbani", "Havana", "Antarctic Peninsula", "Circuit Royal", "Ilios"]
+                await ctx.send(f"You will be playing on: {random.choice(maps)}. Use `!map` to pick a new map.")
 
         else:
             await ctx.send("Queue is not active. Only PUG Masters can start a queue!")
@@ -142,11 +151,11 @@ class QueueCommands(commands.Cog, functions._queue.QueueMixin):
     @commands.command(aliases=["close"], brief=": Stops the queue", description="Stop the queue.")
     @commands.has_role("PUG Master")
     async def stop(self, ctx):
-        # Open Queue if closed
+        # Close Queue if open
         if self.active_queue == True:
             self.active_queue = False
             await ctx.send("Queue has been stopped.")
-        # Queue is already open
+        # Queue is already close
         else:
             await ctx.send("There is not an ongoing queue.")
 
@@ -175,10 +184,10 @@ class QueueCommands(commands.Cog, functions._queue.QueueMixin):
             # Congratulate Game winner
             if winning_team == 0:
                 await ctx.send(f"The game has ended in a draw.")
+                return
             else:
                 await ctx.send(f"The game has ended. Team {winning_team} wins!")        
 
-        #TODO: update all elos (+25 for winning team, -25 for losing team)        
         else:
             await ctx.send("There is not an ongoing game.")
 
