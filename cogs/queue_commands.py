@@ -58,13 +58,12 @@ class QueueCommands(commands.Cog, functions._queue.QueueMixin):
                 await ctx.send(self.display_teams(team1, team2, team1_average, team2_average))
 
                 # Move players to their team's channel 
-                await ctx.send("Moving players to voice channels in 3...")
+                await ctx.send("Moving players to voice channels in 5...")
                 time.sleep(1)
-                await ctx.send("Moving players to voice channels in 2...")
-                time.sleep(1)
-                await ctx.send("Moving players to voice channels in 1...")
-                time.sleep(1)
-                await ctx.send("Moving players to voice channels.")
+                for second in range(4, 0, -1):
+                    await ctx.send(second + "...")
+                    time.sleep(1)
+                await ctx.send("Moving players now.")
 
                 guild = self.client.get_guild(ctx.guild.id)
                 channel = self.client.get_channel(1107126277971906600) 

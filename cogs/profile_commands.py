@@ -26,7 +26,7 @@ class ProfileCommands(commands.Cog, functions._profile.ProfileMixin):
         # Check if document with this name already exists 
         document = self.players_collection.find_one({"name": author})
         if document:
-            await ctx.send("You already have an account! Use !view to see your elo.")
+            await ctx.send("You already have an account! Use `!view` to see your elo.")
             return
 
         # Check if elos are valid
@@ -74,7 +74,7 @@ class ProfileCommands(commands.Cog, functions._profile.ProfileMixin):
         
         elos = [elo] #check_valid_elo takes in a list
         if self.check_valid_elo(elos) is None: # A length of 0 means an empty list was returned, meaning there was an invalid elo entered
-            await ctx.send("Invalid elo entered. Command suspended.")
+            await ctx.send("Invalid elo entered.")
             return
         else:
             elo = self.check_valid_elo(elos)[0] # 0th index because check_valid_elo returns a list. In this case it will always be of length 1
@@ -108,7 +108,7 @@ class ProfileCommands(commands.Cog, functions._profile.ProfileMixin):
         if not document:
             # User is the author AND no account in the database
             if user is None:
-                await ctx.send("You don't have an account. Use !create to make one.")
+                await ctx.send("You don't have an account. Use `!create` to make one.")
                 return
             
             await ctx.send("We couldn't find an account with that name.")
