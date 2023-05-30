@@ -61,7 +61,7 @@ class QueueCommands(commands.Cog, functions._queue.QueueMixin):
                 await ctx.send("Moving players to voice channels in 5...")
                 time.sleep(1)
                 for second in range(4, 0, -1):
-                    await ctx.send(second + "...")
+                    await ctx.send(str(second) + "...")
                     time.sleep(1)
                 await ctx.send("Moving players now.")
 
